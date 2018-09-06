@@ -1,0 +1,28 @@
+version: '3.6'
+services:
+  postgres:
+    image: postgres
+    ports:
+    - "5432:5432"
+    environment:
+    - "POSTGRES_PASSWORD:dalong"
+    volumes:
+    - ./db_data:/var/lib/postgresql/data
+  benthos:
+    image: jeffail/benthos
+    volumes:
+    - "./configs/webhook.yaml:/benthos.yaml"
+    ports:
+    - "4195:4195"
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0-alpha16
+    ports:
+    - "8080:8080"
+    depends_on:
+    - "postgres"
+    environment:
+    - "POSTGRES_PASSWORD:dalong"
+    command: >
+      /bin/sh -c "
+      graphql-engine --database-url postgres://postgres:dalong@postgres:5432/postgres serve --enable-console;
+      "
